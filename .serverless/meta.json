@@ -1,0 +1,225 @@
+{
+  "/Users/mac/Documents/Projects/Nebula/nebula-mock-challenge-api/serverless.yml": {
+    "versionFramework": "4.18.0",
+    "servicePath": "/Users/mac/Documents/Projects/Nebula/nebula-mock-challenge-api/serverless.yml",
+    "serviceConfigFileName": "serverless.yml",
+    "service": {
+      "service": "nebula-mock-challenge",
+      "useDotenv": true,
+      "plugins": [
+        "serverless-dotenv-plugin",
+        "serverless-offline"
+      ],
+      "provider": {
+        "name": "aws",
+        "runtime": "nodejs20.x",
+        "region": "eu-north-1",
+        "environment": {
+          "AWS_REGION": "${env:AWS_REGION}",
+          "COGNITO_APP_CLIENT_ID": "${env:COGNITO_APP_CLIENT_ID}",
+          "COGNITO_APP_SECRET": "<REDACTED>",
+          "LEADERBOARD_TABLE_NAME": "${env:LEADERBOARD_TABLE_NAME}",
+          "WEBSOCKET_CONNECTION_URL": "${env:WEBSOCKET_CONNECTION_URL}"
+        },
+        "iam": {
+          "role": {
+            "statements": [
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "dynamodb:PutItem",
+                  "dynamodb:Query",
+                  "dynamodb:Scan",
+                  "dynamodb:GetItem",
+                  "dynamodb:DeleteItem"
+                ],
+                "Resource": [
+                  "${env:LEADERBOARD_TABLE_ARN}"
+                ]
+              },
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "execute-api:ManageConnections"
+                ],
+                "Resource": "arn:aws:execute-api:${env:AWS_REGION}:*:*/*/@connections/*"
+              }
+            ]
+          }
+        }
+      },
+      "functions": {
+        "signup": {
+          "handler": "src/controllers/auth/register.register",
+          "events": [
+            {
+              "http": {
+                "path": "auth/register",
+                "method": "post",
+                "cors": true
+              }
+            }
+          ]
+        },
+        "confirmSignup": {
+          "handler": "src/controllers/auth/confirmSignup.confirmSignup",
+          "events": [
+            {
+              "http": {
+                "path": "auth/confirm-signup",
+                "method": "post",
+                "cors": true
+              }
+            }
+          ]
+        },
+        "login": {
+          "handler": "src/controllers/auth/login.login",
+          "events": [
+            {
+              "http": {
+                "path": "auth/login",
+                "method": "post",
+                "cors": true
+              }
+            }
+          ]
+        },
+        "submitScore": {
+          "handler": "src/controllers/score/submitScore.submitScore",
+          "events": [
+            {
+              "http": {
+                "path": "scores/submit",
+                "method": "post",
+                "cors": true
+              }
+            }
+          ]
+        },
+        "getLeaderboard": {
+          "handler": "src/controllers/score/getLeaderboard.getLeaderboard",
+          "events": [
+            {
+              "http": {
+                "path": "scores/top",
+                "method": "get",
+                "cors": true
+              }
+            }
+          ]
+        },
+        "websocketConnect": {
+          "handler": "src/controllers/websocket.onConnect.onConnect",
+          "events": [
+            {
+              "websocket": {
+                "route": "$connect"
+              }
+            }
+          ]
+        },
+        "websocketDisconnect": {
+          "handler": "src/controllers/websocket.onDisconnect.onDisconnect",
+          "events": [
+            {
+              "websocket": {
+                "route": "$disconnect"
+              }
+            }
+          ]
+        },
+        "websocketDefault": {
+          "handler": "src/controllers/websocket.defaultHandler",
+          "events": [
+            {
+              "websocket": {
+                "route": "$default"
+              }
+            }
+          ]
+        }
+      },
+      "resources": {
+        "Resources": {
+          "LeaderboardTable": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+              "TableName": "${env:LEADERBOARD_TABLE_NAME}",
+              "AttributeDefinitions": [
+                {
+                  "AttributeName": "id",
+                  "AttributeType": "S"
+                }
+              ],
+              "KeySchema": [
+                {
+                  "AttributeName": "id",
+                  "KeyType": "HASH"
+                }
+              ],
+              "BillingMode": "PAY_PER_REQUEST"
+            }
+          }
+        }
+      },
+      "custom": {
+        "serverless-offline": {
+          "httpPort": 5000
+        }
+      }
+    },
+    "provider": {
+      "name": "aws",
+      "runtime": "nodejs20.x",
+      "region": "eu-north-1",
+      "environment": {
+        "AWS_REGION": "${env:AWS_REGION}",
+        "COGNITO_APP_CLIENT_ID": "${env:COGNITO_APP_CLIENT_ID}",
+        "COGNITO_APP_SECRET": "<REDACTED>",
+        "LEADERBOARD_TABLE_NAME": "${env:LEADERBOARD_TABLE_NAME}",
+        "WEBSOCKET_CONNECTION_URL": "${env:WEBSOCKET_CONNECTION_URL}"
+      },
+      "iam": {
+        "role": {
+          "statements": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:PutItem",
+                "dynamodb:Query",
+                "dynamodb:Scan",
+                "dynamodb:GetItem",
+                "dynamodb:DeleteItem"
+              ],
+              "Resource": [
+                "${env:LEADERBOARD_TABLE_ARN}"
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "execute-api:ManageConnections"
+              ],
+              "Resource": "arn:aws:execute-api:${env:AWS_REGION}:*:*/*/@connections/*"
+            }
+          ]
+        }
+      }
+    },
+    "error": {
+      "message": "request to https://core.serverless.com/api/bff/ failed, reason: getaddrinfo ENOTFOUND core.serverless.com",
+      "stack": "Error: request to https://core.serverless.com/api/bff/ failed, reason: getaddrinfo ENOTFOUND core.serverless.com\n    at Authentication.getClientDataFromAccessKey (file:///Users/mac/.serverless/releases/4.18.0/package/dist/sf-core.js:808:18758)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async Authentication.getAuthenticatedData (file:///Users/mac/.serverless/releases/4.18.0/package/dist/sf-core.js:808:3689)\n    at async Authentication.authenticate (file:///Users/mac/.serverless/releases/4.18.0/package/dist/sf-core.js:808:22245)\n    at async TraditionalRunner.resolveVariablesAndAuthenticate (file:///Users/mac/.serverless/releases/4.18.0/package/dist/sf-core.js:812:2379)\n    at async TraditionalRunner.run (file:///Users/mac/.serverless/releases/4.18.0/package/dist/sf-core.js:1428:27914)\n    at async route (file:///Users/mac/.serverless/releases/4.18.0/package/dist/sf-core.js:1603:2878)\n    at async Object.run (file:///Users/mac/.serverless/releases/4.18.0/package/dist/sf-core.js:1604:3661)\n    at async run2 (file:///Users/mac/.serverless/releases/4.18.0/package/dist/sf-core.js:1604:4815)"
+    },
+    "serviceRawFile": "service: nebula-mock-challenge\nuseDotenv: true\nplugins:\n  - serverless-dotenv-plugin\n  - serverless-offline\n\nprovider:\n  name: aws\n  runtime: nodejs20.x\n  region: ${env:AWS_REGION}\n  environment:\n    AWS_REGION: ${env:AWS_REGION}\n    COGNITO_APP_CLIENT_ID: ${env:COGNITO_APP_CLIENT_ID}\n    COGNITO_APP_SECRET: ${env:COGNITO_APP_SECRET}\n    LEADERBOARD_TABLE_NAME: ${env:LEADERBOARD_TABLE_NAME}\n    WEBSOCKET_CONNECTION_URL: ${env:WEBSOCKET_CONNECTION_URL}\n\n  iam:\n    role:\n      statements:\n        - Effect: Allow\n          Action:\n            - dynamodb:PutItem\n            - dynamodb:Query\n            - dynamodb:Scan\n            - dynamodb:GetItem\n            - dynamodb:DeleteItem\n          Resource:\n            - ${env:LEADERBOARD_TABLE_ARN}\n        - Effect: Allow\n          Action:\n            - execute-api:ManageConnections\n          Resource: \"arn:aws:execute-api:${env:AWS_REGION}:*:*/*/@connections/*\"\n\nfunctions:\n  signup:\n    handler: src/controllers/auth/register.register\n    events:\n      - http:\n          path: auth/register\n          method: post\n          cors: true\n\n  confirmSignup:\n    handler: src/controllers/auth/confirmSignup.confirmSignup\n    events:\n      - http:\n          path: auth/confirm-signup\n          method: post\n          cors: true\n\n  login:\n    handler: src/controllers/auth/login.login\n    events:\n      - http:\n          path: auth/login\n          method: post\n          cors: true\n\n  submitScore:\n    handler: src/controllers/score/submitScore.submitScore\n    events:\n      - http:\n          path: scores/submit\n          method: post\n          cors: true\n\n  getLeaderboard:\n    handler: src/controllers/score/getLeaderboard.getLeaderboard\n    events:\n      - http:\n          path: scores/top\n          method: get\n          cors: true\n\n  websocketConnect:\n    handler: src/controllers/websocket.onConnect.onConnect\n    events:\n      - websocket:\n          route: $connect\n\n  websocketDisconnect:\n    handler: src/controllers/websocket.onDisconnect.onDisconnect\n    events:\n      - websocket:\n          route: $disconnect\n\n  websocketDefault:\n    handler: src/controllers/websocket.defaultHandler\n    events:\n      - websocket:\n          route: $default\n\nresources:\n  Resources:\n    LeaderboardTable:\n      Type: AWS::DynamoDB::Table\n      Properties:\n        TableName: ${env:LEADERBOARD_TABLE_NAME}\n        AttributeDefinitions:\n          - AttributeName: id\n            AttributeType: S\n        KeySchema:\n          - AttributeName: id\n            KeyType: HASH\n        BillingMode: PAY_PER_REQUEST\n\ncustom:\n  serverless-offline:\n    httpPort: 5000\n",
+    "command": [
+      "offline"
+    ],
+    "options": {},
+    "serviceProviderAwsCfStackId": null,
+    "serviceProviderAwsCfStackCreated": null,
+    "serviceProviderAwsCfStackUpdated": null,
+    "serviceProviderAwsCfStackStatus": null,
+    "serviceProviderAwsCfStackOutputs": null
+  }
+}
