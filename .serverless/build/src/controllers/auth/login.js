@@ -49,7 +49,7 @@ var cognitoClient = new import_client_cognito_identity_provider.CognitoIdentityP
 
 // src/controllers/auth/login.ts
 var login = async (event) => {
-  const { preferred_username, password } = JSON.parse(event.body);
+  const { preferred_username, password } = JSON.parse(event.body || {});
   try {
     if (!preferred_username || !password) {
       return {
@@ -69,7 +69,7 @@ var login = async (event) => {
     const response = await cognitoClient.send(command);
     return {
       statusCode: 200,
-      body: JSON.stringify({ token: response.AuthenticationResult })
+      body: JSON.stringify(response.AuthenticationResult)
     };
   } catch (error) {
     return {

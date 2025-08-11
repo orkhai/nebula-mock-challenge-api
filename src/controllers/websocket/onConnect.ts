@@ -1,27 +1,26 @@
 import { APIGatewayProxyHandler } from "aws-lambda";
-import { decodeJwt } from "../../utils/decodeJwt";
 import dynamoClient from "../../lib/dynamoClient";
 import { PutCommand } from "@aws-sdk/lib-dynamodb";
 
 export const onConnect: APIGatewayProxyHandler = async (event) => {
   try {
-    const token = event.queryStringParameters?.token;
-    if (!token) return { statusCode: 401, body: "Missing token" };
-
-    const user = decodeJwt(token);
-    const userId = user.sub;
+    const connectionId = event.requestContext.connectionId;
+    console.log("onConnect triggered", { connectionId });
+    if (!connectionId) return { statusCode: 400, body: "No connectionId" };
 
     await dynamoClient.send(
       new PutCommand({
-        TableName: "websocket_connections",
+        TableName: process.env.WEBSOCKET_CONNECTIONS_TABLE_NAME,
         Item: {
-          user_id: userId,
-          connectionId: event.requestContext.connectionId,
+          connectionId,
+          connectedAt: Date.now(),
         },
       })
     );
 
-    return { statusCode: 200, body: "Connected" };
+    console.log("Connection saved to DynamoDB", { connectionId });
+
+    return { statusCode: 200, body: "connected" };
   } catch (e) {
     return { statusCode: 500, body: "Connection failed" };
   }

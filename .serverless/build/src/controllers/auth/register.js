@@ -49,7 +49,9 @@ var cognitoClient = new import_client_cognito_identity_provider.CognitoIdentityP
 
 // src/controllers/auth/register.ts
 var register = async (event) => {
-  const { email, password, name, preferred_username } = JSON.parse(event.body);
+  const { email, password, name, preferred_username } = JSON.parse(
+    event.body || {}
+  );
   try {
     if (!email || !password || !name || !preferred_username) {
       return {

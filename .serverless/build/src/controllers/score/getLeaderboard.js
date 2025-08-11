@@ -23,7 +23,6 @@ __export(getLeaderboard_exports, {
   getLeaderboard: () => getLeaderboard
 });
 module.exports = __toCommonJS(getLeaderboard_exports);
-var import_client_dynamodb2 = require("@aws-sdk/client-dynamodb");
 
 // src/lib/dynamoClient.ts
 var import_client_dynamodb = require("@aws-sdk/client-dynamodb");
@@ -35,24 +34,22 @@ var dynamoClient = import_lib_dynamodb.DynamoDBDocumentClient.from(client);
 var dynamoClient_default = dynamoClient;
 
 // src/controllers/score/getLeaderboard.ts
-var getLeaderboard = async () => {
+var import_lib_dynamodb2 = require("@aws-sdk/lib-dynamodb");
+var getLeaderboard = async (event) => {
   try {
     const data = await dynamoClient_default.send(
-      new import_client_dynamodb2.ScanCommand({
+      new import_lib_dynamodb2.ScanCommand({
         TableName: process.env.LEADERBOARD_TABLE_NAME
       })
     );
-    const topScore = data.Items?.sort((a, b) => b.score - a.score)[0];
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ topScore })
-    };
+    const items = data.Items || [];
+    items.sort((a, b) => (b.score || 0) - (a.score || 0));
+    const topScore = items.slice(0, 1);
+    return { statusCode: 200, body: JSON.stringify({ topScore }) };
   } catch (error) {
     return {
-      statusCode: 400,
-      body: JSON.stringify({
-        message: error.message
-      })
+      statusCode: 500,
+      body: JSON.stringify({ message: error.message })
     };
   }
 };

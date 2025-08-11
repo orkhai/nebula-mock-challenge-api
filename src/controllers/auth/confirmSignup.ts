@@ -4,7 +4,7 @@ import { cognitoClient } from "../../lib/cognitoClient";
 import { APIGatewayProxyHandler } from "aws-lambda";
 
 export const confirmSignup: APIGatewayProxyHandler = async (event: any) => {
-  const { preferred_username, confirmationCode } = JSON.parse(event.body);
+  const { preferred_username, confirmationCode } = JSON.parse(event.body || {});
 
   try {
     if (!preferred_username || !confirmationCode) {

@@ -49,7 +49,7 @@ var cognitoClient = new import_client_cognito_identity_provider.CognitoIdentityP
 
 // src/controllers/auth/confirmSignup.ts
 var confirmSignup = async (event) => {
-  const { preferred_username, confirmationCode } = JSON.parse(event.body);
+  const { preferred_username, confirmationCode } = JSON.parse(event.body || {});
   try {
     if (!preferred_username || !confirmationCode) {
       return {

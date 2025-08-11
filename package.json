@@ -2,12 +2,13 @@
   "name": "nebula-mock-challenge-api",
   "version": "1.0.0",
   "description": "API for mock challenge",
-  "main": "dist/index.js",
+  "main": "dist/lambda.js",
   "scripts": {
     "build": "tsc",
-    "deploy": "serverless deploy",
-    "offline": "serverless offline",
-    "start": "npm run offline"
+    "start": "ts-node src/app.ts",
+    "dev": "nodemon --watch 'src/**/*.ts' --exec ts-node src/app.ts",
+    "lambda:build": "tsc",
+    "lint": "eslint . --ext .ts"
   },
   "repository": {
     "type": "git",
@@ -26,18 +27,25 @@
     "@aws-sdk/client-dynamodb": "^3.862.0",
     "@aws-sdk/lib-dynamodb": "^3.863.0",
     "aws-lambda": "^1.0.7",
+    "body-parser": "^2.2.0",
     "dotenv": "^17.2.1",
+    "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.152",
+    "@types/body-parser": "^1.19.6",
+    "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.2.0",
+    "nodemon": "^3.1.10",
     "serverless": "^4.18.0",
     "serverless-dotenv-plugin": "^6.0.0",
     "serverless-offline": "^14.4.0",
-    "serverless-plugin-typescript": "^2.1.5"
+    "serverless-plugin-typescript": "^2.1.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
   },
   "overrides": {
     "serverless-offline": {
